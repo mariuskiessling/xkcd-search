@@ -72,7 +72,7 @@ def main():
             download their meta data for further processing.""")
     parser.add_argument("output", help="""the directory the comics will be
             saved to (the directory will be created if it does not exist yet
-            and cleaned if it does""")
+            and cleaned if it does)""")
     parser.add_argument("--save-raw-comics", help="""also save the raw json files
             before concatenation""", action="store_true")
 
