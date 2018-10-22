@@ -1,0 +1,29 @@
+@charset "utf-8";
+
+$primary: #96A8C8;
+
+@import "../node_modules/bulma/bulma";
+
+@font-face {
+  font-family: xkcd-script;
+  src: url('../fonts/xkcd-script.woff') format('woff');
+}
+
+#search-header {
+  text-align: center;
+  font-family: xkcd-script;
+
+  &.is-fullheight {
+    transition: min-height 1s;
+  }
+
+  .title {
+    margin-bottom: 40px
+  }
+
+  .input {
+    font-family: xkcd-script;
+    border: 0;
+  }
+}
+
