@@ -6518,3 +6518,14 @@ label.panel-block {
   #search-header .input {
     font-family: xkcd-script;
     border: 0; }
+
+.comic h3 {
+  margin: 0; }
+
+.comic .published {
+  display: block;
+  margin: 0 0 10px 0; }
+
+.comic a {
+  display: inline-block;
+  margin: 0 0 20px 0; }

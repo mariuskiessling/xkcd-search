@@ -22,7 +22,7 @@
                     <input class="input is-large is-rounded" type="text" placeholder="e.g. machine learning" v-model="query">
                   </p>
                   <p class="control">
-                    <button class="button info is-large is-light is-rounded" v-on:click="search">
+                    <button class="button info is-large is-light is-rounded" v-bind:class="{ 'is-loading': loading }" v-on:click="search">
                       Search
                     </button>
                   </p>
@@ -34,7 +34,17 @@
       </section>
       <section class="section">
         <div class="container">
-          {{ results }}
+          <h2 class="title is-spaced is-size-2" v-if="results.length == 0 && searchPerformed">No results</h2>
+
+          <div class="box has-text-centered comic" v-for="comic in results">
+            <h3 class="is-size-3 is-spaced has-text-weight-bold">{{ comic.title }}</h3>
+            <span class="published">
+              <span class="has-text-weight-semibold">Published:</span>
+              {{ comic.month }}/{{ comic.day }}/{{ comic.year }}
+            </span>
+            <a :href="'https://xkcd.com/' + comic.num" target="_blank" class="button is-primary is-small">Open original comic</a><br />
+            <img :src="comic.img" :alt="comic.alt">
+          </div>
         </div>
       </section>
     </div>

@@ -27,3 +27,18 @@ $primary: #96A8C8;
   }
 }
 
+.comic {
+  h3 {
+    margin: 0;
+  }
+
+  .published {
+    display: block;
+    margin: 0 0 10px 0;
+  }
+  
+  a {
+    display: inline-block;
+    margin: 0 0 20px 0;
+  }
+}
