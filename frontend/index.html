@@ -6,32 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>XKCD search</title>
     <link rel="stylesheet" href="css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   </head>
   <body>
-    <section id="search-header" class="hero is-medium is-primary">
-      <div class="hero-body">
-        <div class="container">
-          <div class="columns">
-            <div class="column is-8-desktop is-offset-2-desktop">
-              <h1 class="title is-spaced is-size-1">What comic are you looking for?</h1>
-              <div class="field is-grouped">
-                <p class="control is-expanded">
-                  <input class="input is-large is-rounded" type="text" placeholder="e.g. machine learning">
-                </p>
-                <p class="control">
-                  <a class="button info is-large is-light is-rounded">
-                    Search
-                  </a>
-                </p>
+    <div id="app">
+      <section id="search-header" class="hero is-medium is-primary">
+        <div class="hero-body">
+          <div class="container">
+            <div class="columns">
+              <div class="column is-8-desktop is-offset-2-desktop">
+                <h1 class="title is-spaced is-size-1">What comic are you looking for?</h1>
+                <div class="field is-grouped">
+                  <p class="control is-expanded">
+                    <input class="input is-large is-rounded" type="text" placeholder="e.g. machine learning" v-model="query">
+                  </p>
+                  <p class="control">
+                    <button class="button info is-large is-light is-rounded" v-on:click="search">
+                      Search
+                    </button>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
-    <section class="section">
-      <div class="container">
-      </div>
-    </section>
+      </section>
+      <section class="section">
+        <div class="container">
+          {{ results }}
+        </div>
+      </section>
+    </div>
+    <script src="lib/main.js"></script>
   </body>
 </html>
