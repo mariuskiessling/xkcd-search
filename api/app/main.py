@@ -43,7 +43,7 @@ def search(q):
             'save_title': row[4].decode('utf-8'),
             'transcript': row[5],
             'alt':        row[6].decode('utf-8'),
-            'img':        row[7],
+            'img':        row[7].decode('utf-8'),
             'title':      row[8].decode('utf-8'),
             'day':        row[9]
         })
