@@ -12,7 +12,7 @@ def empty_search():
 def search(q):
     sqlQ = '''
         SELECT num, month, link, news, save_title, transcript, alt, img, title,
-            day
+            day, year
         FROM comics
         WHERE MATCH(title,save_title,alt,transcript) AGAINST(%s)'''
 
@@ -45,7 +45,8 @@ def search(q):
             'alt':        row[6].decode('utf-8'),
             'img':        row[7].decode('utf-8'),
             'title':      row[8].decode('utf-8'),
-            'day':        row[9]
+            'day':        row[9],
+            'year':       row[10]
         })
     
     return jsonify(answer)
