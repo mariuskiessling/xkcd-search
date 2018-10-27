@@ -60,9 +60,6 @@ class Crawler:
 
             counter = counter + 1
 
-            if counter > 5:
-                break
-
         f.close()
         print('Successfully downloaded ' + str(counter) + ' comics.')
 
