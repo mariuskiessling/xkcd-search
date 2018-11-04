@@ -74,14 +74,14 @@ placeComicFile = BashOperator(
 
 dropHiveDatabase = HiveOperator(
     task_id='stage2_drop_hive_db',
-    hql='DROP TABLE IF EXISTS xkcd_comics;',
+    hql='DROP TABLE IF EXISTS xkcd_search;',
     hive_cli_conn_id='hive_cli_default',
     dag=dag)
 
 createHiveSchema = HiveOperator(
     task_id='stage2_create_hive_schema',
     hql="""
-        CREATE EXTERNAL TABLE IF NOT EXISTS xkcd_comics(
+        CREATE EXTERNAL TABLE IF NOT EXISTS xkcd_search(
         month INT,
         num INT,
         link STRING,
