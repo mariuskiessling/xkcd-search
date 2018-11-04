@@ -1,6 +1,8 @@
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.hive_operator import HiveOperator
+from airflow.operators.mysql_operator import MySqlOperator 
+from airflow.operators.hive_to_mysql import HiveToMySqlTransfer
 import datetime
 
 default_args = {
@@ -75,7 +77,7 @@ placeComicFile = BashOperator(
 dropHiveDatabase = HiveOperator(
     task_id='stage2_drop_hive_db',
     hql='DROP TABLE IF EXISTS xkcd_search;',
-    hive_cli_conn_id='hive_cli_default',
+    hive_cli_conn_id='beeline_default',
     dag=dag)
 
 createHiveSchema = HiveOperator(
@@ -97,10 +99,52 @@ createHiveSchema = HiveOperator(
         ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
         STORED AS TEXTFILE LOCATION '/user/hadoop/xkcd-search/raw/{{ execution_date.year }}/{{ execution_date.day }}/{{ execution_date.month }}/{{ execution_date.hour }}-{{ execution_date.minute }}-{{ execution_date.second }}';
         """,
-    hive_cli_conn_id='hive_cli_default',
+    hive_cli_conn_id='beeline_default',
     dag=dag)
+
+dropMysqlDatabase = MySqlOperator(
+    task_id='stage3_drop_mysql_schema',
+    mysql_conn_id='mysql_default',
+    sql='DROP TABLE IF EXISTS comics',
+    database='xkcd_search',
+    dag=dag)
+
+createMysqlSchema = MySqlOperator(
+    task_id='stage3_create_mysql_schema',
+    mysql_conn_id='mysql_default',
+    sql="""
+        CREATE TABLE comics (
+        month int(11) DEFAULT NULL,
+        num int(11) NOT NULL,
+        link varchar(256) DEFAULT '',
+        year int(11) NOT NULL,
+        news varchar(256) DEFAULT '',
+        save_title text,
+        transcript text,
+        alt text,
+        img varchar(256) DEFAULT NULL,
+        title text,
+        day int(11) DEFAULT NULL,
+        PRIMARY KEY (num),
+        FULLTEXT KEY title (title,save_title,alt,transcript)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        """,
+    database='xkcd_search',
+    dag=dag)
+
+migrateToEndUserDB = HiveToMySqlTransfer(
+    task_id='stage3_migrate_to_end_user_db',
+    sql='SELECT * FROM xkcd_comics',
+    mysql_table='xkcd_search.comics',
+    mysql_conn_id='mysql_default',
+    hiveserver2_conn_id='hiveserver2_default',
+    dag=dag)
+
 
 createRunDateDir.set_upstream(createHdfsBase)
 placeComicFile.set_upstream(createRunDateDir)
 dropHiveDatabase.set_upstream(placeComicFile)
 createHiveSchema.set_upstream(dropHiveDatabase)
+dropMysqlDatabase.set_upstream(createHiveSchema)
+createMysqlSchema.set_upstream(dropMysqlDatabase)
+migrateToEndUserDB.set_upstream(createMysqlSchema)
