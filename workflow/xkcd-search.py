@@ -16,16 +16,14 @@ default_args = {
     'start_date': datetime.datetime.utcnow(),
 }
 
-runDate = datetime.datetime.now()
-
 dag = DAG(
     'xkcd_search', default_args=default_args, schedule_interval=None)
 
 
-#downloadComics = BashOperator(
-#    task_id='stage1_download_comics',
-#    bash_command='python3 /home/hadoop/xkcd-search/crawler/crawler.py /home/hadoop/xkcd-search/raw',
-#    dag=dag)
+downloadComics = BashOperator(
+    task_id='stage1_download_comics',
+    bash_command='python3 /home/hadoop/xkcd-search/crawler/crawler.py /home/hadoop/xkcd-search/raw',
+    dag=dag)
 
 createHdfsBase = BashOperator(
     task_id='stage1_create_hdfs_base',
@@ -37,7 +35,7 @@ hadoop fs -mkdir -p /user/hadoop/xkcd-search/raw/\
 {{ execution_date.year }}
 hadoop fs -mkdir -p /user/hadoop/xkcd-search/raw/\
 {{ execution_date.year }}/\
-{{ params.runDate.day }}
+{{ execution_date.day }}
 hadoop fs -mkdir -p /user/hadoop/xkcd-search/raw/\
 {{ execution_date.year }}/\
 {{ execution_date.day }}/\
@@ -54,7 +52,6 @@ hadoop fs -mkdir -p /user/hadoop/xkcd-search/raw/\
 createRunDateDir = BashOperator(
     task_id='stage1_create_run_date_dir',
     bash_command=createRunDateDirCmd,
-    params={'runDate': runDate},
     dag=dag)
 
 placeComicFileCmd = """
@@ -71,7 +68,6 @@ hadoop fs -put /home/hadoop/xkcd-search/raw/xkcd.json \
 placeComicFile = BashOperator(
     task_id='stage1_place_comic_file',
     bash_command=placeComicFileCmd,
-    params={'runDate': runDate},
     dag=dag)
 
 dropHiveDatabase = HiveOperator(
@@ -118,7 +114,7 @@ createMysqlSchema = MySqlOperator(
         num int(11) NOT NULL,
         link varchar(256) DEFAULT '',
         year int(11) NOT NULL,
-        news varchar(256) DEFAULT '',
+        news text,
         save_title text,
         transcript text,
         alt text,
@@ -134,13 +130,14 @@ createMysqlSchema = MySqlOperator(
 
 migrateToEndUserDB = HiveToMySqlTransfer(
     task_id='stage3_migrate_to_end_user_db',
-    sql='SELECT * FROM xkcd_comics',
+    sql='SELECT * FROM xkcd_search',
     mysql_table='xkcd_search.comics',
     mysql_conn_id='mysql_default',
     hiveserver2_conn_id='hiveserver2_default',
     dag=dag)
 
 
+createHdfsBase.set_upstream(downloadComics)
 createRunDateDir.set_upstream(createHdfsBase)
 placeComicFile.set_upstream(createRunDateDir)
 dropHiveDatabase.set_upstream(placeComicFile)
