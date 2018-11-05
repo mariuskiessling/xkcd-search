@@ -1,8 +1,11 @@
 from flask import Flask
 from flask import jsonify
+import json
 import mysql.connector
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/search/')
 def empty_search():
@@ -10,17 +13,18 @@ def empty_search():
 
 @app.route('/search/<q>')
 def search(q):
+    q = '"' + q + '"'
     sqlQ = '''
         SELECT num, month, link, news, save_title, transcript, alt, img, title,
             day, year
         FROM comics
-        WHERE MATCH(title,save_title,alt,transcript) AGAINST(%s)'''
+        WHERE MATCH(title,save_title,alt,transcript) AGAINST(%s IN BOOLEAN MODE)'''
 
     db = mysql.connector.connect(
       host="127.0.0.1",
-      user="root",
-      passwd="",
-      database="xkcd-search"
+      user="hadoop",
+      passwd="hadoophadoophadoop",
+      database="xkcd_search"
     )
 
     if(not db):
@@ -38,10 +42,10 @@ def search(q):
         answer.append({
             'num':        row[0],
             'month':      row[1],
-            'link':       row[2],
-            'news':       row[3],
+            'link':       row[2].decode('utf-8'),
+            'news':       row[3].decode('utf-8'),
             'save_title': row[4].decode('utf-8'),
-            'transcript': row[5],
+            'transcript': row[5].decode('utf-8'),
             'alt':        row[6].decode('utf-8'),
             'img':        row[7].decode('utf-8'),
             'title':      row[8].decode('utf-8'),
@@ -49,4 +53,4 @@ def search(q):
             'year':       row[10]
         })
     
-    return jsonify(answer)
+    return json.dumps(answer)
