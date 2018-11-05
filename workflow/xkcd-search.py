@@ -5,6 +5,8 @@ from airflow.operators.mysql_operator import MySqlOperator
 from airflow.operators.hive_to_mysql import HiveToMySqlTransfer
 import datetime
 
+skipDownload = False
+
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
@@ -18,12 +20,6 @@ default_args = {
 
 dag = DAG(
     'xkcd_search', default_args=default_args, schedule_interval=None)
-
-
-downloadComics = BashOperator(
-    task_id='stage1_download_comics',
-    bash_command='python3 /home/hadoop/xkcd-search/crawler/crawler.py /home/hadoop/xkcd-search/raw',
-    dag=dag)
 
 createHdfsBase = BashOperator(
     task_id='stage1_create_hdfs_base',
@@ -136,8 +132,13 @@ migrateToEndUserDB = HiveToMySqlTransfer(
     hiveserver2_conn_id='hiveserver2_default',
     dag=dag)
 
+if not skipDownload:
+    downloadComics = BashOperator(
+        task_id='stage1_download_comics',
+        bash_command='python3 /home/hadoop/xkcd-search/crawler/crawler.py /home/hadoop/xkcd-search/raw',
+        dag=dag)
+    downloadComics.set_downstream(createHdfsBase)
 
-createHdfsBase.set_upstream(downloadComics)
 createRunDateDir.set_upstream(createHdfsBase)
 placeComicFile.set_upstream(createRunDateDir)
 dropHiveDatabase.set_upstream(placeComicFile)
