@@ -9,30 +9,6 @@ titlepage: no
 colorlinks: yes
 ---
 
-# Projektkomponenten
-## Crawler
-Der einfache Crawler lädt die Metadaten der XKCD-Comics von der Website
-herunter und speichert sie lokal. Er ist in Python 3 realisiert und kann somit
-mehr oder weniger plattformunabhängig ausgeführt werden.
-
-## API
-Die API stellt die Schnittstelle zwischen dem Frontend und der
-End-User-Datenbank dar. So wird ein direkter Zugriff auf die Datenbank durch
-den Nutzer vermieden. Auch sie ist in Python 3 implementiert und bietet eine
-einzige REST-Ressource. Unter \texttt{/search/<query>} kann das Frontend nach
-Comics in der Datenbank suchen. Für die Suche wird die MySQL Volltextsuche
-verwendet. Die Antwort ist stets ein Array von Comic-Objekten. Wurden keine
-Comics gefunden, wird ein leeres Array zurückgegeben.
-
-## Frontend
-Das Frontend ist die Schnittstelle des Nutzers mit der Anwendung. Sie ist eine
-einfache Webanwendung basierend auf Vue.js. Dem Nutzer wird eine klar
-strukturierte Suchmaske präsentiert, mit der der Nutzer transparent mit der API
-kommunizieren kann. Die Ergebnisse der Suche werden übersichtlich für den
-Nutzer dargestellt. Die eigentlichen Comic-Bilder von der offiziellen
-XKCD-Website abgerufen (basierend auf den Informationen in der
-End-User-Datenbank).
-
 # Struktur des Workflows
 Der Workflow ist in drei grundlegende Stufen eingeteilt. Die erste Stufe lädt
 die Comics von XKCD herunter und bereitet das HDFS vor. Im zweiten Schritt
@@ -141,3 +117,29 @@ alle Datensätze aus der Hive-Datenbank in die MySQL-Datenbank transferiert
 werden. Glücklicherweise bietet Airflow mit dem \texttt{HiveToMySqlTransfer}
 Operator eine Schnittstelle, die diese Aufgabe schnell und zuverlässlich
 übernimmt. Mit diesem Schritt ist der Workflow erfolgreich abgeschlossen.
+
+# Projektkomponenten
+## Crawler
+Der einfache Crawler lädt die Metadaten der XKCD-Comics von der Website
+herunter und speichert sie lokal. Er ist in Python 3 realisiert und kann somit
+mehr oder weniger plattformunabhängig ausgeführt werden.
+
+## API
+Die API stellt die Schnittstelle zwischen dem Frontend und der
+End-User-Datenbank dar. So wird ein direkter Zugriff auf die Datenbank durch
+den Nutzer vermieden. Auch sie ist in Python 3 implementiert und bietet eine
+einzige REST-Ressource. Unter \texttt{/search/<query>} kann das Frontend nach
+Comics in der Datenbank suchen. Für die Suche wird die MySQL Volltextsuche
+verwendet. Die Antwort ist stets ein Array von Comic-Objekten. Wurden keine
+Comics gefunden, wird ein leeres Array zurückgegeben.
+
+## Frontend
+Das Frontend ist die Schnittstelle des Nutzers mit der Anwendung. Sie ist eine
+einfache Webanwendung basierend auf Vue.js. Dem Nutzer wird eine klar
+strukturierte Suchmaske präsentiert, mit der der Nutzer transparent mit der API
+kommunizieren kann. Die Ergebnisse der Suche werden übersichtlich für den
+Nutzer dargestellt. Die eigentlichen Comic-Bilder von der offiziellen
+XKCD-Website abgerufen (basierend auf den Informationen in der
+End-User-Datenbank).
+
+![Beispielsuche im Frontend](example_search.png "Beispielsuche im Frontend")
