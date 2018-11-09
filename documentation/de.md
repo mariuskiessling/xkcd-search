@@ -13,17 +13,16 @@ colorlinks: yes
 Der Workflow ist in drei grundlegende Stufen eingeteilt. Die erste Stufe lädt
 die Comics von XKCD herunter und bereitet das HDFS vor. Im zweiten Schritt
 werden daraufhin die Daten, die von Schritt 1 bereitgestellt wurden, in Hive
-eingepflegt und aufbereitet. Im selben Zuge werden auch alle für Hive
-benötigten Strukturen angelegt. In der dritten und letzten Phase werden die
-Daten aus Hive in eine End-User-Datenbank exportiert.  Diese Datenbank ist die
-Arbeitsbasis für die Suche, die der Nutzer in einem einfachen Frontend anstoßen
-kann.
+eingepflegt und aufbereitet. Im selben Zuge werden alle für Hive benötigten
+Strukturen angelegt. In der dritten und letzten Phase werden die Daten aus Hive
+in eine End-User-Datenbank exportiert.  Diese Datenbank ist die Arbeitsbasis
+für die Suche, die der Nutzer in einem einfachen Frontend anstoßen kann.
 
 ## *Stage 1*: Comics herunterladen
 Dieser Schritt liefert die Datengrundlage für den Rest des Workflows. Er kann
 optional übersprungen werden, indem im DAG die Variable \texttt{skipDownloads}
-aktiviert wird. Das Script akzeptiert ebenfalls einen Parameter, mit dem Output
-Pfad des Downloads angegeben wird. Eine volle Unterstützung für die
+aktiviert wird. Das Script akzeptiert ebenfalls einen Parameter, mit dem der
+Output Pfad des Downloads angegeben wird. Eine volle Unterstützung für die
 \texttt{--help} Funktion wurde implementiert.
 
 ```
@@ -63,17 +62,17 @@ Rohdaten enthalten wird.
 
 ## *Stage 1*: HDFS Datumstruktur anlegen
 Um eine langfristige Speicherung der Comics zu gewährleisten wird pro
-Ausführung des DAGs im \texttt{raw} Verzeichnis eine Datumstruktur angelegt.
+Ausführung des DAGs im \texttt{raw} Verzeichnis eine Datumsstruktur angelegt.
 Sie folgt dabei dem Muster \texttt{../raw/YYYY/DD/MM/HH-MM-SS/}. So können auch
 bei täglicher Ausführung des Workflows zwei Tage miteinander verglichen werden.
 
 ## *Stage 1*: Comic-Datei im HDFS platzieren
 Die Datei, die im ersten Schritt des Workflows vom Crawler erstellt wurde, wird
-nun in das gerade angelegte Datumverzeichnis im HDFS platziert.
+nun in das gerade angelegte Datumsverzeichnis im HDFS platziert.
 
 ## *Stage 2*: Entfernen der bisherigen Comic Tabelle in Hive
 Um Kollisionen mit alten Datensätzen zu vermeiden, wird zunächst die alte
-Comic-Datenbank in Hive entfernt. Dabei ist wichtig zu erwähnen, dass die
+Comic-Tabelle in Hive entfernt. Dabei ist es wichtig zu erwähnen, dass die
 Tabelle mit dem \texttt{EXTERNAL}-Keyword erstellt wurde. Auf Grund dessen wird
 bei dem Löschen der Tabelle die dahinter liegende Datei nicht aus dem HDFS
 gelöscht. Dies ist vor allem aus dem Gesichtspunkt der Datenarchivierung
@@ -106,7 +105,7 @@ In diesem Schritt wird die Datengrundlage für die Nutzeranwendung angelegt.
 Besonders muss hier auf die Volltextschlüssel von MySQL verwiesen werden. Mit
 Hilfe dieses Schlüssels ist es möglich eine schnelle und zuverlässige
 Volltextsuche für den Nutzer zu implementieren. Der Schlüssel wird über die
-Spalten \texttt{title, save_title, alt} und \texttt{transcript} angelegt. Mit
+Spalten \texttt{title, savetitle, alt} und \texttt{transcript} angelegt. Mit
 dieser Breite an Spalten ist es dem Nutzer möglich mehr Ergebnisse zu seiner
 Suche zu erhalten als wenn der Schlüssel z.B. nur über den Titel gelegt werden
 würde.
@@ -114,9 +113,10 @@ würde.
 ## *Stage 3*: Transferieren der Daten von Hive in die End-User-Datenbank
 Um die Daten schließlich für die Nutzeranwendung sichtbar zu machen, müssen
 alle Datensätze aus der Hive-Datenbank in die MySQL-Datenbank transferiert
-werden. Glücklicherweise bietet Airflow mit dem \texttt{HiveToMySqlTransfer}
-Operator eine Schnittstelle, die diese Aufgabe schnell und zuverlässlich
-übernimmt. Mit diesem Schritt ist der Workflow erfolgreich abgeschlossen.
+werden. Glücklicherweise bietet Airflow mit dem \linebreak
+ \texttt{HiveToMySqlTransfer} Operator eine Schnittstelle, die diese Aufgabe
+schnell und zuverlässlich übernimmt. Mit diesem Schritt ist der Workflow
+erfolgreich abgeschlossen.
 
 # Projektkomponenten
 ## Crawler
@@ -138,7 +138,7 @@ Das Frontend ist die Schnittstelle des Nutzers mit der Anwendung. Sie ist eine
 einfache Webanwendung basierend auf Vue.js. Dem Nutzer wird eine klar
 strukturierte Suchmaske präsentiert, mit der der Nutzer transparent mit der API
 kommunizieren kann. Die Ergebnisse der Suche werden übersichtlich für den
-Nutzer dargestellt. Die eigentlichen Comic-Bilder von der offiziellen
+Nutzer dargestellt. Die eigentlichen Comic-Bilder werden von der offiziellen
 XKCD-Website abgerufen (basierend auf den Informationen in der
 End-User-Datenbank).
 
