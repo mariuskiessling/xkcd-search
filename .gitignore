@@ -3,4 +3,7 @@
 
 crawler/data
 
+frontend/lib
+frontend/css
+
 node_modules/
